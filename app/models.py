@@ -11,6 +11,13 @@ from hashlib import md5
 def load_user(id):
   return db.session.get(User, int(id))
 
+followers = sa.Table(
+    'followers',
+    db.metadata,
+    sa.Column('follower_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True),
+    sa.Column('followed_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True)
+  )
+
 class User(UserMixin, db.Model):
   id: so.Mapped[int] = so.mapped_column(primary_key=True)
   username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
@@ -19,6 +26,17 @@ class User(UserMixin, db.Model):
   posts: so.WriteOnlyMapped['Post'] = so.relationship('Post',back_populates='author')
   bio: so.Mapped[Optional[str]] = so.mapped_column(sa.String(140))
   last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(default=lambda: datetime.now(timezone.utc))
+  following: so.WriteOnlyMapped['User'] = so.relationship(
+    secondary=followers, primaryjoin=(followers.c.follower_id == id),
+    secondaryjoin=(followers.c.followed_id == id),
+    back_populates='followers'
+  )
+  followers: so.WriteOnlyMapped['User'] = so.relationship(
+    secondary=followers, primaryjoin=(followers.c.followed_id == id),
+    secondaryjoin=(followers.c.follower_id == id),
+    back_populates='following'
+  )
+
 
   def __repr__(self):
     return '<User {}>'.format(self.username)
@@ -32,6 +50,7 @@ class User(UserMixin, db.Model):
   def avatar(self, size):
     digest = md5(self.email.lower().encode('utf-8')).hexdigest()
     return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
+  
   
 class Post(db.Model):
   id: so.Mapped[int] = so.mapped_column(primary_key=True)

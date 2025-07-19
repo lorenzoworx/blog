@@ -2,3 +2,4 @@ flask3_1/
 .flaskenv
 __pycache__/
 app.db
+logs/
