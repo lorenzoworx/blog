@@ -10,7 +10,6 @@ from urllib.parse import urlsplit
 @app.route('/index')
 @login_required
 def index():
-  user_profile = {'username': 'Iddy'}
   posts = [
     {
       'author': {'username': 'Oshoke'},
@@ -21,7 +20,7 @@ def index():
       'body': 'Lorem ipsum sit dolor amet'
     }
   ]
-  return render_template('index.html', title='Home', user=user_profile, posts=posts)
+  return render_template('index.html', title='Home', posts=posts)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -31,7 +30,7 @@ def login():
   form = LoginForm()
   if form.validate_on_submit():
     user = db.session.scalar(sa.select(User).where(User.username == form.username.data))
-    if not(User) or not(user.check_password(form.password.data)):
+    if not(user) or not(user.check_password(form.password.data)):
       flash('Invalid username or password')
       return redirect(url_for('login'))
     login_user(user, remember=form.remember_me.data)
