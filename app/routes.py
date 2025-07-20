@@ -15,8 +15,8 @@ def before_request():
     db.session.commit()
 
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET','POST'])
+@app.route('/index', methods=['GET','POST'])
 @login_required
 def index():
   form = PostForm()
@@ -46,7 +46,7 @@ def login():
     if not(next_page) or urlsplit(next_page).netloc != '':
       next_page = url_for('index')
     return redirect(next_page) 
-  return render_template('login.html', title='Sign In', form=form)
+  return render_template('login.html', title='Sign-In', form=form)
 
 
 @app.route('/logout')
@@ -136,4 +136,13 @@ def unfollow(username):
     return redirect(url_for('user', username=username))
   else:
     return redirect(url_for('index'))
+  
+
+@app.route('/explore')
+@login_required
+def explore():
+  query = sa.select(Post).order_by(Post.timestamp.desc())
+  posts = db.session.scalars(query).all()
+  return render_template('index.html', title='Explore', posts=posts)
+
   
