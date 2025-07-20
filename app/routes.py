@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm
-from app.models import User
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm
+from app.models import User, Post
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
 from urllib.parse import urlsplit
@@ -19,17 +19,25 @@ def before_request():
 @app.route('/index')
 @login_required
 def index():
+  form = PostForm()
+  if form.validate_on_submit():
+    post = Post(body=form.post.data, author=current_user)
+    db.session.add(post)
+    db.session.commit()
+    flash('Thoughts shared successfully')
+    return redirect(url_for('index'))
+
   posts = [
     {
-      'author': {'username': 'Oshoke'},
+      'author': {'username': 'john'},
       'body': 'The quick brown fox jumps over the lazy dog'
     },
     {
-      'author': {'username': 'Bubu'},
+      'author': {'username': 'susan'},
       'body': 'Lorem ipsum sit dolor amet'
     }
   ]
-  return render_template('index.html', title='Home', posts=posts)
+  return render_template('index.html', title='Home', posts=posts, form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -137,3 +145,4 @@ def unfollow(username):
     return redirect(url_for('user', username=username))
   else:
     return redirect(url_for('index'))
+  
