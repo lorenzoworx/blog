@@ -27,16 +27,7 @@ def index():
     flash('Thoughts shared successfully')
     return redirect(url_for('index'))
 
-  posts = [
-    {
-      'author': {'username': 'john'},
-      'body': 'The quick brown fox jumps over the lazy dog'
-    },
-    {
-      'author': {'username': 'susan'},
-      'body': 'Lorem ipsum sit dolor amet'
-    }
-  ]
+  posts = db.session.scalars(current_user.following_posts()).all()
   return render_template('index.html', title='Home', posts=posts, form=form)
 
 
