@@ -3,3 +3,4 @@ flask3_1/
 __pycache__/
 app.db
 logs/
+messages.pot
