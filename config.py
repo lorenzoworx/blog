@@ -11,6 +11,7 @@ class Config:
   MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
   ADMINS = ['asocialinfroverf@gmail.com']
   LANGUAGES = ['en', 'es', 'fr']
+  MS_TRANSLATOR_KEY = os.environ.get('MS_TRANSLATOR_KEY')
   POSTS_PER_PAGE = 20
   # MAIL_SERVER = 'localhost'
   # MAIL_PORT = 8025
